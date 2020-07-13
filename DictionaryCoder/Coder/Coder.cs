@@ -10,93 +10,131 @@ namespace DictionaryCoder.Coder
 
     public class Coder
     {
+        int LookAheadBufferSize { get; set; }
+        int CodeBufferSize { get; set; }
 
-        static int InputBufferSize = 128;
-        static int CodeBufferSize = 128;
-
-
-        public Coder() { }
-
-
-        public void WriteOutput()
+        public Coder(int LookAheadBufferSize, int codeBufferSize)
         {
-            throw new NotImplementedException("function not implemented");
+            this.LookAheadBufferSize = LookAheadBufferSize;
+            this.CodeBufferSize = codeBufferSize;
         }
 
-        public void Decode()
+        /**
+        Function encodes given data using LZ77 algorithm
+        @param: data
+        @return: 
+        */
+        public int EncodeLZ77(string inputFilePath, string outputFilePath)
         {
-            throw new NotImplementedException("function not implemented");
-
-        }
-        public string EncodeLZ77(string data)
-        {
-            if (data.Length <= 0) throw new ArgumentException("data is invalid");
-            byte[] inputbuffer = new byte[InputBufferSize];
-            byte[] codeBuffer = new byte[CodeBufferSize];
-
-            string Encoded = "";
-            int codePointer = 0;
-            int inputPointer = CodeBufferSize;
-
-
-            // main while loop
-            while (inputPointer + InputBufferSize <= data.Length - 1)
+            try
             {
-                //iterate over code buffer to find match, when match found, try to find longer
-                for (int i = inputPointer; i >= 0; i--)
+                using (FileStream fsSource = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read))
                 {
-                    if (data[inputPointer] == data[codePointer])
+                    byte[] CodeBuffer = new byte[CodeBufferSize];
+                    byte[] LookAheadBuffer = new byte[LookAheadBufferSize];
+
+                    int Offset = 0;
+                    while (LookAheadBufferSize > 0)
                     {
-                        string repetition = FindRepetition(out int offset, data, codePointer, inputPointer);
-                        if (repetition.Length >= 0)
+                        // Read may return anything from 0 to LookAheadBufferSize.
+                        int InputSize = fsSource.Read(LookAheadBuffer, Offset, LookAheadBufferSize);
+
+                        Console.WriteLine(InputSize);
+                        // Break when the end of the file is reached.
+                        if (InputSize == 0) break;
+                        if (Offset == 0) Array.Fill(CodeBuffer, LookAheadBuffer[0]);
+
+                        Console.WriteLine(CodeBuffer + " | " + LookAheadBuffer);
+
+                        //iterate over code buffer to find matching sequence
+                        Sequence Repetition = FindRepetition(CodeBuffer, LookAheadBuffer);
+
+                        WriteOutput(Repetition.Offset, Repetition.Length, Repetition.NextChar);
+                        Offset += Repetition.Length + 1;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"not keked {e}");
+                // Handle invalid input or null data here
+                return -1;
+            }
+            Console.WriteLine("keked");
+
+            return 1;
+        }
+
+        private void WriteOutput(int offset, int length, byte nextChar)
+        {
+            Console.WriteLine($"({offset},{length}){nextChar}");
+        }
+
+        /*
+        Structure that holds information about LZ77 encoding output value
+        */
+        struct Sequence
+        {
+            public int Length { get; set; }
+            public int Offset { get; set; }
+            public byte NextChar { get; set; }
+        }
+
+        /**
+        finds longest repeated sequence from lookaheadbuffer within window buffer
+        @return: longest repeated sequence
+        */
+        private Sequence FindRepetition(byte[] windowBuffer, byte[] lookAheadBuffer)
+        {
+            List<Sequence> Sequences = new List<Sequence>();
+            bool IsFinished = true;
+            int Offset = 0;
+
+            while (IsFinished)
+            {
+                if (Offset >= windowBuffer.Length) break;
+                bool IsRepeating = true;
+                int Length = 0;
+                int CodePointer = 0;
+
+                ///?????
+                int LookAheadPointer = 0;
+
+                while (IsRepeating)
+                {
+                    if (windowBuffer[CodePointer] == windowBuffer[LookAheadPointer])
+                    {
+                        CodePointer++;
+                        LookAheadPointer++;
+                    }
+                    else
+                    {
+                        Sequences.Add(new Sequence
                         {
-                            int shift = repetition.Length + 1;
-                            inputPointer += shift;
-                            codePointer += shift;
-                            char lastChar = data[codePointer - 1];
-                            WriteOutput(offset, repetition.Length, lastChar);
-                            Encoded += $"{offset},{repetition.Length},{}";
-                        }
+                            Length = Length,
+                            Offset = Offset,
+                            NextChar = windowBuffer[CodePointer]
+                        });
+                        IsRepeating = false;
                     }
+                    Length++;
                 }
-            }
-            return Encoded;
-        }
-
-        private void WriteOutput(int offset, int Length, char lastChar)
-        {
-
-
-        }
-
-        private string FindRepetition(out int offset, string data, int codePointer, int inputPointer)
-        {
-            offset = 0;
-            List<string> reps = new List<string>();
-            bool isRepeating = true;
-            bool isFinished = true;
-            while (isFinished)
-            {
-                offset = 0;
-                string repetition = "";
-                while (isRepeating)
-                {
-                    offset++;
-                    if (data[codePointer] == data[inputPointer])
-                    {
-                        repetition += data[codePointer];
-                        codePointer++;
-                        inputPointer++;
-                    }
-                    else break;
-                }
+                Offset++;
             }
 
-            int MaxLength = reps.Max(s => s.Length);
-            string LongestRepetition = reps.FirstOrDefault(s => s.Length == MaxLength);
+            //finding the longest matching sequence
+            int MaxLength = Sequences.Max(s => s.Length);
+            Sequence LongestRepetition = Sequences.FirstOrDefault(s => s.Length == MaxLength);
             return LongestRepetition;
         }
+
+        public void DecodeLZ77()
+        {
+            throw new NotImplementedException("function not implemented");
+        }
+
     }
+
 }
 
 
