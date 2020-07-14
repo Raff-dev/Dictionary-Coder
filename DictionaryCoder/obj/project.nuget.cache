@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kjv/r59UaZG0/z1g4ijG4fh9N5wPO1KSVovD1hSRD3+0bk+XInWoM11x6i+wkX20b8JxZeV7avKa3qkcUjUKSw==",
+  "dgSpecHash": "Tn4d6dE3yiVscIcKaOI31W0jLXuxpfXDTDcq3V7qsoEdHHwsA39QRV6ysw5sFSm9au0dv56WJdEAuMIk+lN7Gg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\DictionaryCoder\\DictionaryCoder.csproj",
+  "projectFilePath": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\Dictionary-Coder\\DictionaryCoder\\DictionaryCoder.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnet.webapi.client\\5.2.6\\microsoft.aspnet.webapi.client.5.2.6.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore\\2.1.1\\microsoft.aspnetcore.2.1.1.nupkg.sha512",

@@ -11800,11 +11800,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\DictionaryCoder\\DictionaryCoder.csproj",
+      "projectUniqueName": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\Dictionary-Coder\\DictionaryCoder\\DictionaryCoder.csproj",
       "projectName": "DictionaryCoder",
-      "projectPath": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\DictionaryCoder\\DictionaryCoder.csproj",
+      "projectPath": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\Dictionary-Coder\\DictionaryCoder\\DictionaryCoder.csproj",
       "packagesPath": "C:\\Users\\Raff\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\DictionaryCoder\\obj\\",
+      "outputPath": "C:\\Users\\Raff\\Desktop\\DictionaryCoder\\Dictionary-Coder\\DictionaryCoder\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

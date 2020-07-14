@@ -9,10 +9,9 @@ namespace DictionaryCoder.Coder
 {
     class Program
     {
-
         static void Main(string[] args)
         {
-            Coder Coder = new Coder(10, 5);
+            Coder Coder = new Coder(20, 10);
             Coder.EncodeLZ77("text.txt", "output.txt");
         }
     }

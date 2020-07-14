@@ -13,10 +13,10 @@ namespace DictionaryCoder.Coder
         int LookAheadBufferSize { get; set; }
         int CodeBufferSize { get; set; }
 
-        public Coder(int LookAheadBufferSize, int codeBufferSize)
+        public Coder(int codeBufferSize, int lookAheadBufferSize)
         {
-            this.LookAheadBufferSize = LookAheadBufferSize;
             this.CodeBufferSize = codeBufferSize;
+            this.LookAheadBufferSize = lookAheadBufferSize;
         }
 
         /**
@@ -24,7 +24,7 @@ namespace DictionaryCoder.Coder
         @param: data
         @return: 
         */
-        public int EncodeLZ77(string inputFilePath, string outputFilePath)
+        public void EncodeLZ77(string inputFilePath, string outputFilePath)
         {
             try
             {
@@ -34,44 +34,58 @@ namespace DictionaryCoder.Coder
                     byte[] LookAheadBuffer = new byte[LookAheadBufferSize];
 
                     int Offset = 0;
+
                     while (LookAheadBufferSize > 0)
                     {
+                        byte[] readBuffer = new byte[LookAheadBufferSize];
                         // Read may return anything from 0 to LookAheadBufferSize.
-                        int InputSize = fsSource.Read(LookAheadBuffer, Offset, LookAheadBufferSize);
+                        Console.WriteLine("Offset: " + Offset);
+                        int InputSize = fsSource.Read(LookAheadBuffer, 0, LookAheadBufferSize);
+                        Console.WriteLine("Input Size: " + InputSize);
 
-                        Console.WriteLine(InputSize);
+                        foreach (var content in LookAheadBuffer) Console.Write((char)content);
+                        Console.WriteLine();
+
                         // Break when the end of the file is reached.
                         if (InputSize == 0) break;
+
+                        // Fill Code buffer with first byte
                         if (Offset == 0) Array.Fill(CodeBuffer, LookAheadBuffer[0]);
 
-                        Console.WriteLine(CodeBuffer + " | " + LookAheadBuffer);
 
-                        //iterate over code buffer to find matching sequence
-                        Sequence Repetition = FindRepetition(CodeBuffer, LookAheadBuffer);
+                        /*
+                        */
+                        while (readBuffer.Length > 0)
+                        {
 
-                        WriteOutput(Repetition.Offset, Repetition.Length, Repetition.NextChar);
-                        Offset += Repetition.Length + 1;
+                            //iterate over code buffer to find matching sequence
+                            Sequence Repetition = FindRepetition(CodeBuffer, LookAheadBuffer);
+
+                            WriteOutput(Repetition.Offset, Repetition.Length, Repetition.NextChar);
+
+                            int Shift = Repetition.Length + 1;
+                            CodeBuffer = CodeBuffer.Skip(Shift).Concat(LookAheadBuffer.Take(Shift)).ToArray();
+                            LookAheadBuffer = LookAheadBuffer.Skip(Shift).Concat(readBuffer.Take(Shift)).ToArray();
+                            readBuffer = readBuffer.Skip(Shift).ToArray();
+
+                            Offset += Shift;
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"not keked {e}");
-                // Handle invalid input or null data here
-                return -1;
             }
-            Console.WriteLine("keked");
-
-            return 1;
         }
 
         private void WriteOutput(int offset, int length, byte nextChar)
         {
-            Console.WriteLine($"({offset},{length}){nextChar}");
+            Console.WriteLine($"({offset},{length}){(char)nextChar}");
         }
 
         /*
-        Structure that holds information about LZ77 encoding output value
+        Structure that contains information about LZ77 encoding output value
         */
         struct Sequence
         {
@@ -84,41 +98,38 @@ namespace DictionaryCoder.Coder
         finds longest repeated sequence from lookaheadbuffer within window buffer
         @return: longest repeated sequence
         */
-        private Sequence FindRepetition(byte[] windowBuffer, byte[] lookAheadBuffer)
+        private Sequence FindRepetition(byte[] codeBuffer, byte[] lookAheadBuffer)
         {
+            bool Debug = false;
+
+            byte[] WindowBuffer = codeBuffer.Concat(lookAheadBuffer).ToArray();
             List<Sequence> Sequences = new List<Sequence>();
-            bool IsFinished = true;
+
             int Offset = 0;
-
-            while (IsFinished)
+            while (Offset < codeBuffer.Length)
             {
-                if (Offset >= windowBuffer.Length) break;
-                bool IsRepeating = true;
                 int Length = 0;
-                int CodePointer = 0;
+                int CodePointer = Offset;
+                int LookAheadPointer = codeBuffer.Length;
 
-                ///?????
-                int LookAheadPointer = 0;
+                if (Debug) Console.WriteLine("Codep " + CodePointer);
 
-                while (IsRepeating)
+                while (WindowBuffer[CodePointer] == WindowBuffer[LookAheadPointer])
                 {
-                    if (windowBuffer[CodePointer] == windowBuffer[LookAheadPointer])
-                    {
-                        CodePointer++;
-                        LookAheadPointer++;
-                    }
-                    else
-                    {
-                        Sequences.Add(new Sequence
-                        {
-                            Length = Length,
-                            Offset = Offset,
-                            NextChar = windowBuffer[CodePointer]
-                        });
-                        IsRepeating = false;
-                    }
+                    if (Debug) Console.WriteLine("content :" + WindowBuffer[CodePointer]);
+
                     Length++;
+                    CodePointer++;
+                    if (++LookAheadPointer > WindowBuffer.Length) break;
                 }
+
+                Sequences.Add(new Sequence
+                {
+                    Length = Length,
+                    Offset = Offset,
+                    NextChar = WindowBuffer[LookAheadPointer]
+                });
+
                 Offset++;
             }
 
