@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DictionaryCoder", "DictionaryCoder.csproj", "{1AC1B27B-2A80-4B67-9514-1019A16C15D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DictionaryCoder", "DictionaryCoder.csproj", "{D883A098-7F17-41A4-B567-AB0CAB32D37F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1AC1B27B-2A80-4B67-9514-1019A16C15D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1AC1B27B-2A80-4B67-9514-1019A16C15D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1AC1B27B-2A80-4B67-9514-1019A16C15D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1AC1B27B-2A80-4B67-9514-1019A16C15D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D883A098-7F17-41A4-B567-AB0CAB32D37F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D883A098-7F17-41A4-B567-AB0CAB32D37F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D883A098-7F17-41A4-B567-AB0CAB32D37F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D883A098-7F17-41A4-B567-AB0CAB32D37F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {792BE829-6134-4FC8-8209-5215E7C08DB0}
+		SolutionGuid = {29248943-03F9-4A0F-943A-4EC7ACDBFB53}
 	EndGlobalSection
 EndGlobal

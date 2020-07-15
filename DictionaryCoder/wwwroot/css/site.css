@@ -1,37 +1,151 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
-for details on configuring this project to bundle and minify static web assets. */
-body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+﻿* {
+    padding: 0;
+    margin: 0;
+    display: block;
+    font-family: verdana;
 }
 
-/* Wrapping element */
-/* Set some basic padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
-}
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
-}
+/* Navbar styles
+-------------------------------------------------- */
 
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"] {
+nav {
+    position: absolute;
+    top: 0;
+    justify-self: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    text-transform: uppercase;
+    height: 8rem;
     width: 100%;
+    padding: 2rem 4rem;
 }
 
-/* QR code generator */
-#qrCode {
-    margin: 15px;
-}
-
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-    /* Hide captions */
-    .carousel-caption {
-        display: none;
+    nav .brand {
+        white-space: normal;
+        text-align: center;
     }
+
+    nav ul {
+        height: auto;
+        font-weight: 600;
+        list-style-type: none;
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
+
+    nav li {
+        display: inline-block;
+        align-content: center;
+        justify-content: center;
+        text-align: center;
+        vertical-align: central;
+    }
+
+    nav a {
+        padding: 10px;
+        color: #eee6d6;
+        text-decoration: none;
+        transition: all .1s ease-in;
+    }
+
+        nav a:hover {
+            color: #eee6ff;
+            text-decoration: none;
+            transform: scale(1.1);
+        }
+
+
+    nav .link-image {
+    }
+
+        nav .link-image img {
+            height: 45px;
+            width: 45px;
+        }
+
+/* Header styles
+-------------------------------------------------- */
+
+header {
 }
+
+    header img {
+        max-height: 600px;
+        min-width: 100vw;
+        width: auto;
+        overflow: hidden;
+        object-fit: cover;
+        z-index: -1;
+    }
+
+    header .content {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%,50%);
+        display: block;
+        justify-content: center;
+        align-content: center;
+        border-radius: 10px;
+    }
+
+        header .content .button {
+            padding: 0.5rem 1rem;
+            margin: 3rem;
+            transition: all .1s ease-in;
+        }
+
+            header .content .button:hover {
+                transform: scale(1.1);
+                cursor: pointer;
+            }
+/* Main styles
+-------------------------------------------------- */
+main {
+    padding: 2rem 2rem 0 2rem;
+}
+
+    main .content {
+        height: 1200px;
+    }
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+    font-size: 14px;
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
+    margin-top: 50px;
+}
+
+    .footer .contact {
+    }
