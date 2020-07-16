@@ -38,7 +38,7 @@ nav {
     }
 
     nav li {
-        display: inline-block;
+        display: flex;
         align-content: center;
         justify-content: center;
         text-align: center;
@@ -93,26 +93,62 @@ header {
         border-radius: 10px;
     }
 
-        header .content .button {
-            padding: 0.5rem 1rem;
-            margin: 3rem;
-            transition: all .1s ease-in;
-        }
 
-            header .content .button:hover {
-                transform: scale(1.1);
-                cursor: pointer;
-            }
+
+
 /* Main styles
 -------------------------------------------------- */
 main {
-    padding: 2rem 2rem 0 2rem;
 }
 
-    main .content {
-        height: 1200px;
-    }
+.content {
+    display: block;
+    height: auto;
+}
 
+.content > div {
+    display: flex;
+    justify-content: center;
+}
+
+.content > div > div {
+    display: block;
+    justify-content: center;
+    margin: 10vh;
+}
+
+.content .drag-file {
+    position: relative;
+    height: 200px;
+    width: 500px;
+    border-color: #69B6F1;
+    border-radius: 40px;
+    background-color: rgb(250, 250, 255);
+    border: dashed;
+    justify-content: center;
+    display: flex;
+    padding: 3rem;
+}
+
+.content .drag-file > div {
+    position:absolute;
+    top:50%;
+    transform:translate(0,-50%);
+    display: block;
+    align-items: center;
+}
+
+.content .drag-file span {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+    .content .button {
+        margin-left: 4rem;
+        margin-right: 4rem;
+    }
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
@@ -139,8 +175,6 @@ button.accept-policy {
 }
 
 .footer {
-    position: absolute;
-    bottom: 0;
     width: 100%;
     white-space: nowrap;
     line-height: 60px; /* Vertically center the text there */
@@ -149,3 +183,32 @@ button.accept-policy {
 
     .footer .contact {
     }
+
+
+/* Utilities
+-------------------------------------------------- */
+
+.button {
+    margin-top: 4rem;
+    padding: 1rem 4rem;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    border-radius: 20px;
+    background-color: #1685DB;
+    transition: all .1s ease-in;
+    opacity: 0.8;
+}
+
+.button:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+    background-color: #69B6F1;
+    opacity: 0.9;
+}
+
+.button span {
+    font-size: 22px;
+    font-weight: 500;
+    color: #E0E9F9;
+}

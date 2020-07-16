@@ -22,19 +22,21 @@
                     <a class="dropdown-item" href="#">LZW</a>
                 </div>
             </li>
+
             <li class="nav-item">
                 <a class="link" asp-area="" asp-controller="Home" asp-action="About">About</a>
             </li>
+
             <li class="nav-item">
                 <a class="link" asp-area="" asp-controller="Home" asp-action="Home">Contact</a>
             </li>
+
             <li class="nav-item">
                 <a class="link-image" href="https://github.com/Raff-dev">
                     <img class="nav-icon" src="~/images/github.png" />
                 </a>
             </li>
         </ul>
-
     </nav>
     <header>
         @RenderSection("bgImage", required: true)
@@ -43,23 +45,24 @@
 
     <main role="main">
         @RenderBody()
+
     </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="Contact bg-dark">
+    <footer class="border-top footer text-muted bg-dark" >
+        <div class="Contact">
             <form id="contact" class="d-flex justify-content-around px-5 py-2">
                 <textarea class="text-muted" form="contact">
                     Write your message here
                 </textarea>
                 <div class="d-block">
-                    <input value="E-mail" form="contact" type="email"/>
+                    <input value="E-mail" form="contact" type="email" />
                     <button form="contact" action="submit">Send</button>
                 </div>
             </form>
 
         </div>
         <div class="container d-flex">
-            &copy; 2020 - DictionaryCoder - <a asp-area="" asp-controller="Home" asp-action="Sources">Sources</a>
+            &copy; 2020 - DictionaryCoder - <a asp-area="" asp-controller="Home" asp-action="Sources"> Sources</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
