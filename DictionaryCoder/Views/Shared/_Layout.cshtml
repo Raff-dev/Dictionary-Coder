@@ -28,7 +28,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="link" asp-area="" asp-controller="Home" asp-action="Home">Contact</a>
+                <a class="link" href="#">Contact</a>
             </li>
 
             <li class="nav-item">
@@ -42,13 +42,11 @@
         @RenderSection("bgImage", required: true)
     </header>
 
-
     <main role="main">
         @RenderBody()
-
     </main>
 
-    <footer class="border-top footer text-muted bg-dark" >
+    <footer class="border-top footer text-muted bg-dark">
         <div class="Contact">
             <form id="contact" class="d-flex justify-content-around px-5 py-2">
                 <textarea class="text-muted" form="contact">
