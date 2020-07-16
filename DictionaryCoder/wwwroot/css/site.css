@@ -5,6 +5,31 @@
     font-family: verdana;
 }
 
+/* Utilities
+-------------------------------------------------- */
+
+.button {
+    padding: 1rem 4rem;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    border-radius: 20px;
+    background-color: #69B6F1;
+    transition: all .1s ease-in;
+    opacity: 0.9;
+    border: none;
+    font-size: 22px;
+    font-weight: 500;
+    color: #E0E9F9;
+}
+.button:focus {
+    outline:none;
+}
+    .button:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+    background-color: #1685DB;
+}
 
 /* Navbar styles
 -------------------------------------------------- */
@@ -23,49 +48,49 @@ nav {
     padding: 2rem 4rem;
 }
 
-    nav .brand {
-        white-space: normal;
-        text-align: center;
-    }
+nav .brand {
+    white-space: normal;
+    text-align: center;
+}
 
-    nav ul {
-        height: auto;
-        font-weight: 600;
-        list-style-type: none;
-        display: flex;
-        margin: 0;
-        padding: 0;
-    }
+nav ul {
+    height: auto;
+    font-weight: 600;
+    list-style-type: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
 
-    nav li {
-        display: flex;
-        align-content: center;
-        justify-content: center;
-        text-align: center;
-        vertical-align: central;
-    }
+nav li {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: central;
+}
 
-    nav a {
-        padding: 10px;
-        color: #eee6d6;
-        text-decoration: none;
-        transition: all .1s ease-in;
-    }
+nav a {
+    padding: 10px;
+    color: #eee6d6;
+    text-decoration: none;
+    transition: all .1s ease-in;
+}
 
-        nav a:hover {
-            color: #eee6ff;
-            text-decoration: none;
-            transform: scale(1.1);
-        }
+nav a:hover {
+    color: #eee6ff;
+    text-decoration: none;
+    transform: scale(1.1);
+}
 
 
-    nav .link-image {
-    }
+nav .link-image {
+}
 
-        nav .link-image img {
-            height: 45px;
-            width: 45px;
-        }
+nav .link-image img {
+    height: 45px;
+    width: 45px;
+}
 
 /* Header styles
 -------------------------------------------------- */
@@ -73,26 +98,37 @@ nav {
 header {
 }
 
-    header img {
-        max-height: 600px;
-        min-width: 100vw;
-        width: auto;
-        overflow: hidden;
-        object-fit: cover;
-        z-index: -1;
-    }
+header img {
+    max-height: 600px;
+    min-width: 100vw;
+    width: auto;
+    overflow: hidden;
+    object-fit: cover;
+    z-index: -1;
+}
 
-    header .content {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%,50%);
-        display: block;
-        justify-content: center;
-        align-content: center;
-        border-radius: 10px;
-    }
+header .top {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%,50%);
+    display: block;
+    justify-content: center;
+    align-content: center;
+    border-radius: 10px;
+}
 
+
+header .button {
+    margin: 4rem 0;
+    background-color: #1685DB;
+    opacity: 0.8;
+}
+
+header .button:hover {
+    background-color: #59a6e1;
+    opacity: 0.9;
+}
 
 
 
@@ -117,6 +153,11 @@ main {
     margin: 10vh;
 }
 
+.content .button-div {
+    display: flex;
+    justify-content: center;
+}
+
 .content .drag-file {
     position: relative;
     height: 200px;
@@ -128,14 +169,30 @@ main {
     justify-content: center;
     display: flex;
     padding: 3rem;
+    margin: 3rem;
 }
 
 .content .drag-file > div {
-    position:absolute;
-    top:50%;
-    transform:translate(0,-50%);
+    position: absolute;
+    top: 50%;
+    transform: translate(0,-50%);
     display: block;
     align-items: center;
+}
+
+.content .drag-file .arrow-div {
+    margin: 2rem 0;
+}
+
+.content .drag-file .arrow-div {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.content .drag-file img {
+    height: 60px;
+    width: auto;
 }
 
 .content .drag-file span {
@@ -145,10 +202,11 @@ main {
     text-align: center;
 }
 
-    .content .button {
-        margin-left: 4rem;
-        margin-right: 4rem;
-    }
+.content .button {
+    margin-left: 4rem;
+    margin-right: 4rem;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
@@ -181,34 +239,5 @@ button.accept-policy {
     margin-top: 50px;
 }
 
-    .footer .contact {
-    }
-
-
-/* Utilities
--------------------------------------------------- */
-
-.button {
-    margin-top: 4rem;
-    padding: 1rem 4rem;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    border-radius: 20px;
-    background-color: #1685DB;
-    transition: all .1s ease-in;
-    opacity: 0.8;
-}
-
-.button:hover {
-    transform: scale(1.05);
-    cursor: pointer;
-    background-color: #69B6F1;
-    opacity: 0.9;
-}
-
-.button span {
-    font-size: 22px;
-    font-weight: 500;
-    color: #E0E9F9;
+.footer .contact {
 }
