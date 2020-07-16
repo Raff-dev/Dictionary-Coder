@@ -14,20 +14,27 @@ namespace AspNetCore
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
 #nullable restore
 #line 1 "C:\Users\Raff\Desktop\DictionaryCoder\Dictionary-Coder\DictionaryCoder\Views\_ViewImports.cshtml"
-using DictionaryCoder;
+using React.AspNet;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 2 "C:\Users\Raff\Desktop\DictionaryCoder\Dictionary-Coder\DictionaryCoder\Views\_ViewImports.cshtml"
+using DictionaryCoder;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 3 "C:\Users\Raff\Desktop\DictionaryCoder\Dictionary-Coder\DictionaryCoder\Views\_ViewImports.cshtml"
 using DictionaryCoder.Models;
 
 #line default
 #line hidden
 #nullable disable
     [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"d6a5625cc8fb4476f348b0fe9041c550465d8bf9", @"/Views/Shared/Error.cshtml")]
-    [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"8d340aec547ae21f3457c96b4bf36b539f9c42de", @"/Views/_ViewImports.cshtml")]
+    [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"a11ebd851aa6652f9c586c1557852d0c2578290b", @"/Views/_ViewImports.cshtml")]
     public class Views_Shared_Error : global::Microsoft.AspNetCore.Mvc.Razor.RazorPage<ErrorViewModel>
     {
         #pragma warning disable 1998

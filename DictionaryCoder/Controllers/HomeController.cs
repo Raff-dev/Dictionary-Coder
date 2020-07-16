@@ -23,6 +23,11 @@ namespace DictionaryCoder.Controllers
             return View();
         }
 
+        public IActionResult React()
+        {
+            return View();
+        }
+
         public IActionResult About()
         {
             return View();
