@@ -2,10 +2,20 @@
 var validEncodeExtensions = [".TXT", ".JPG", ".JPEG", ".PNG"]
 var validDecodeExtensions = [".LZ77"]
 
+var animateArrow = false;
+
 function OnDragEnter(e) {
     e.stopPropagation();
     e.preventDefault();
+    if (this == document) animateArrow = true;
 }
+
+function OnDragLeave(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (this == document) animateArrow = false;
+}
+
 
 function OnDragOver(e) {
     e.stopPropagation();
@@ -15,6 +25,7 @@ function OnDragOver(e) {
 function OnDrop(e) {
     e.stopPropagation();
     e.preventDefault();
+    animateArrow = false;
 
     selectedFiles = e.dataTransfer.files;
     e.dataTransfer.clearData();
@@ -73,32 +84,37 @@ function ExtensionIsValid(name, extensions) {
     console.log('final isValid: ' + isValid)
     return isValid;
 }
+
 $(document).ready(function () {
     var file;
     file = document.getElementById("encode-drag-file");
     file.addEventListener("dragenter", OnDragEnter, false);
     file.addEventListener("dragover", OnDragOver, false);
     file.addEventListener("drop", OnDrop, false);
-});
 
-$("#encode-button").click(function () {
-    var data = new FormData();
-    for (var i = 0; i < selectedFiles.length; i++) {
-        data.append(selectedFiles[i].name, selectedFiles[i]);
-    }
-    $.ajax({
-        type: "POST",
-        url: "FileHandler.ashx",
-        contentType: false,
-        processData: false,
-        data: data,
-        success: function (result) {
-            alert(result);
-        },
-        error: function () {
-            alert("There was error encode-buttoning files!");
+    $("#encode-button").click(e => {
+        console.log("kek")
+        if (selectedFiles.length <= 0) return;
+        console.log("not returned")
+
+        var data = new FormData();
+        for (var i = 0; i < selectedFiles.length; i++) {
+            data.append(selectedFiles[i].name, selectedFiles[i]);
         }
+        $.ajax({
+            type: "POST",
+            url: "https://localhost:44359/home/Upload",
+            contentType: false,
+            processData: false,
+            data: data,
+            success: function (result) {
+                console.log(result);
+                alert(result);
+            },
+            error: function (error) {
+                alert("There was error uploading files! " + error);
+
+            }
+        });
     });
 });
-
-console.log("koniaaa")

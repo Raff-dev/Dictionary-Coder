@@ -77,6 +77,9 @@ nav a {
     color: #eee6d6;
     text-decoration: none;
     transition: all .1s ease-in;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 nav a:hover {
@@ -172,7 +175,7 @@ main {
     display: flex;
     padding: 3rem;
     margin: 3rem;
-    text-align:center;
+    text-align: center;
 }
 
 .content .drag-file > div {
