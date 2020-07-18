@@ -42,38 +42,32 @@ namespace DictionaryCoder.Controllers
             return View();
         }
 
-        public HttpResponseMessage Upload()
+        public HttpResponseMessage Upload(string value)
         {
-            var files = Request.Form.Files.ToArray();
-            Console.WriteLine("FILEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEES");
-            foreach (var file in files) Console.WriteLine(file.ToString());
-            Console.WriteLine("FILEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEES");
+            Debug.Write(value);
+            IFormFile[] files = Request.Form.Files.ToArray();
 
-            if (Request.Form.Files.Count > 0)
+            if (files.Length > 0)
             {
-                //IFormFileCollection files = context.Request.Form.Files;
-                //foreach (IFormFile file in files)
-                //{
-                //    using (System.IO.Stream fsSource = file.OpenReadStream())
-                //    {
-                //        using (StreamWriter outputFile = new StreamWriter(Path.Combine("kek", ".txt")))
-                //        {
-                //            while (true)
-                //            {
-                //                byte[] arr = new byte[fsSource.Length];
-                //                int bytesToRead = (int)fsSource.Length;
-                //                if (fsSource.Read(arr, 0, bytesToRead) <= 0) break;
-                //                foreach (var content in arr) Console.Write((char)content);
-                //                //run coder here (outputFile/fssource)
-                //            }
-                //        }
-                //    }
-                //}
+                Debug.WriteLine("FILEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEES");
+                foreach (IFormFile file in files)
+                {
+                    using (Stream fsSource = file.OpenReadStream())
+                    {
+                        while (true)
+                        {
+                            byte[] arr = new byte[fsSource.Length];
+                            int bytesToRead = (int)fsSource.Length;
+                            if (fsSource.Read(arr, 0, bytesToRead) <= 0) break;
+                            foreach (var content in arr) Debug.Write((char)content);
+                            //run coder here (outputFile/fssource)
+                        }
+                    }
+                }
+                Debug.WriteLine("FILEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEES");
             }
             var stream = new MemoryStream();
 
-            //Response.ContentType = "text/plain";
-            //Response.WriteAsync("File uploaded successfully!");
             HttpResponseMessage response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
             {
                 Content = new ByteArrayContent(stream.ToArray())

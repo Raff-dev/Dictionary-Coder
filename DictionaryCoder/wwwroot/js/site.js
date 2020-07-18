@@ -5,27 +5,36 @@ var validDecodeExtensions = [".LZ77"]
 var animateArrow = false;
 
 function OnDragEnter(e) {
+    console.log('enter')
+
     e.stopPropagation();
     e.preventDefault();
-    if (this == document) animateArrow = true;
+    if (this == document) $(".arrow-div").children("img").addClass("bouncy");
 }
 
 function OnDragLeave(e) {
+    console.log('leave')
+
     e.stopPropagation();
     e.preventDefault();
-    if (this == document) animateArrow = false;
+    if (this == document) $(".arrow-div").children("img").removeClass("bouncy");
+    else $(this).css("color", "#69B6F1");
 }
 
 
 function OnDragOver(e) {
+    console.log('over')
+
     e.stopPropagation();
     e.preventDefault();
+    if (this == document) $(".arrow-div").children("img").addClass("bouncy");
+    else $(this).css("color", "blue");
 }
 
 function OnDrop(e) {
     e.stopPropagation();
     e.preventDefault();
-    animateArrow = false;
+    $(".arrow-div").children("img").removeClass("bouncy");
 
     selectedFiles = e.dataTransfer.files;
     e.dataTransfer.clearData();
@@ -86,35 +95,41 @@ function ExtensionIsValid(name, extensions) {
 }
 
 $(document).ready(function () {
-    var file;
-    file = document.getElementById("encode-drag-file");
-    file.addEventListener("dragenter", OnDragEnter, false);
-    file.addEventListener("dragover", OnDragOver, false);
-    file.addEventListener("drop", OnDrop, false);
+    var elements = [document, document.getElementById("encode-drag-file"), document.getElementById("decode-drag-file")];
+    for (index in elements) {
+        const elem = elements[index];
+        elem.addEventListener("dragenter", OnDragEnter, false);
+        elem.addEventListener("dragover", OnDragOver, false);
+        elem.addEventListener("dragleave", OnDragLeave, false);
+        elem.addEventListener("drop", OnDrop, false);
+    }
 
-    $("#encode-button").click(e => {
-        console.log("kek")
-        if (selectedFiles.length <= 0) return;
-        console.log("not returned")
+    var elements = [$("#encode-button"), $("#decode-button")];
+    for (index in elements) {
+        const elem = elements[index];
+        elem.click(e => {
+            if (selectedFiles.length <= 0) return;
+            console.log("not returned")
 
-        var data = new FormData();
-        for (var i = 0; i < selectedFiles.length; i++) {
-            data.append(selectedFiles[i].name, selectedFiles[i]);
-        }
-        $.ajax({
-            type: "POST",
-            url: "https://localhost:44359/home/Upload",
-            contentType: false,
-            processData: false,
-            data: data,
-            success: function (result) {
-                console.log(result);
-                alert(result);
-            },
-            error: function (error) {
-                alert("There was error uploading files! " + error);
-
+            var data = new FormData();
+            for (var i = 0; i < selectedFiles.length; i++) {
+                data.append(selectedFiles[i].name, selectedFiles[i]);
             }
+            $.ajax({
+                type: "POST",
+                url: "https://localhost:44359/home/Upload?value=" + elem.attr('value'),
+                contentType: false,
+                processData: false,
+                data: data,
+                success: function (result) {
+                    console.log(result);
+                    alert(result);
+                },
+                error: function (error) {
+                    alert("There was error uploading files! " + error);
+
+                }
+            });
         });
-    });
+    }
 });
