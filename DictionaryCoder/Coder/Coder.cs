@@ -11,17 +11,27 @@ namespace DictionaryCoder.Coder
     {
         int LookAheadBufferSize { get; set; }
         int CodeBufferSize { get; set; }
-        int offsetBytesSize;
-        int lengthBytesSize;
+        int offsetBytesCount;
+        int lengthBytesCount;
         int sizeSum;
 
         public Coder(int CodeBufferSize, int LookAheadBufferSize)
         {
             this.CodeBufferSize = CodeBufferSize;
             this.LookAheadBufferSize = LookAheadBufferSize;
-            offsetBytesSize = (int)Math.Floor(Math.Log10(CodeBufferSize + LookAheadBufferSize) / Math.Log10(256) + 1);
-            lengthBytesSize = (int)Math.Floor(Math.Log10(LookAheadBufferSize) / Math.Log10(256) + 1);
-            sizeSum = offsetBytesSize + lengthBytesSize + 1;
+            offsetBytesCount = (int)Math.Floor(Math.Log10(CodeBufferSize + LookAheadBufferSize) / Math.Log10(256) + 1);
+            lengthBytesCount = (int)Math.Floor(Math.Log10(LookAheadBufferSize) / Math.Log10(256) + 1);
+            sizeSum = 3;
+        }
+
+        /**
+         * Structure containing information about LZ77 encoding output value.
+         */
+        struct Sequence
+        {
+            public int Length { get; set; }
+            public int Offset { get; set; }
+            public byte NextChar { get; set; }
         }
 
         /**
@@ -64,27 +74,11 @@ namespace DictionaryCoder.Coder
                     // Longest found matching sequence between lookahead and code buffers
                     Sequence repetition = FindRepetition(codeBuffer, lookAheadBuffer);
 
-                    WriteOutput(binaryWriter, repetition);
+                    WriteEncoded(binaryWriter, repetition);
 
                     shift = repetition.Length + 1;
                 }
             }
-        }
-
-        struct WriteStruct
-        {
-            public int MaxSize { get; set; }
-            public byte Data { get; set; }
-        }
-
-        /**
-        * Structure containing information about LZ77 encoding output value.
-        */
-        struct Sequence
-        {
-            public int Length { get; set; }
-            public int Offset { get; set; }
-            public byte NextChar { get; set; }
         }
 
         /**
@@ -138,56 +132,43 @@ namespace DictionaryCoder.Coder
          * Parameters  : outputStream stream, which to use to write data into a file.
          *             : sequence - sequence struct containing information to write down.
          */
-        private void WriteOutput(BinaryWriter binaryWriter, Sequence sequence)
+        private void WriteEncoded(BinaryWriter binaryWriter, Sequence sequence)
         {
             int offset = sequence.Offset;
             int length = sequence.Length;
             byte nextChar = sequence.NextChar;
-            //Console.WriteLine($"\n({offset},{length}){nextChar}");
+            Console.WriteLine($"\n({offset},{length}){(char)nextChar}");
 
+            // Saving offset and length to bytearrays of given size in little endian notation
+            byte[] offsetData = FormatToByteArray(offsetBytesCount, offset);
+            byte[] lengthData = FormatToByteArray(lengthBytesCount, length);
 
-            byte[] offsetData = new byte[offsetBytesSize];
-            byte[] lengthData = new byte[lengthBytesSize];
+            //writing length information within the same byte as last part of offset
+            // if you can save a byte do this
+            offsetData[^1] = (byte)(offsetData[^1] | (lengthData[0] << 4));
+            byte[] writeBuffer = offsetData.Concat(new byte[] { nextChar }).ToArray();
+            binaryWriter.Write(writeBuffer);
+        }
 
-            try
+        /**
+         * Parameters  : bytesCount - count of bytes to wtore data within.
+         *             : data - integer value to format to byte array.
+         * Return      : bytearray containing given information within desired size
+         *               written in little endian notation
+         */
+        byte[] FormatToByteArray(int bytesCount, int data)
+        {
+            byte[] byteArray = BitConverter.GetBytes(data);
+            if (BitConverter.IsLittleEndian)
             {
-                int missing;
-                offsetData = BitConverter.GetBytes(offset);
-
-                missing = offsetBytesSize - offsetData.Length;
-                if (missing > 0) offsetData = offsetData.Concat(new byte[missing]).ToArray();
-
-
-                lengthData = BitConverter.GetBytes(length);
-                missing = lengthBytesSize - lengthData.Length;
-                if (missing > 0) lengthData = lengthData.Concat(new byte[missing]).ToArray();
-
-                offsetData = offsetData.Take(offsetBytesSize).ToArray();
-                lengthData = lengthData.Take(lengthBytesSize).ToArray();
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(offsetData);
-                    Array.Reverse(lengthData);
-                }
-
-                //Console.WriteLine("offset");
-                //foreach (byte b in offsetData) Console.WriteLine(b);
-                //Console.WriteLine("length");
-                //foreach (byte b in lengthData) Console.WriteLine(b);
-
-                byte[] writeBuffer = offsetData.Concat(lengthData.Concat(new byte[] { nextChar })).ToArray();
-                if (writeBuffer.Length != sizeSum)
-                {
-                    Console.WriteLine("Invalid size: " + sizeSum + "|" + writeBuffer.Length);
-                    Console.WriteLine("Offsetbuf: " + offsetData.Length);
-                    Console.WriteLine("lengthbuf: " + lengthData.Length);
-                }
-                binaryWriter.Write(writeBuffer);
+                byteArray = byteArray.Take(bytesCount).ToArray();
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine("ZAAAPIS: " + e.Message);
+                byteArray = byteArray.Skip(byteArray.Length - bytesCount).ToArray();
+                Array.Reverse(byteArray);
             }
+            return byteArray;
         }
 
         /**
@@ -197,11 +178,8 @@ namespace DictionaryCoder.Coder
         */
         public void DecodeLZ77(Stream fileStream, string outputPath)
         {
-
             int bytesToRead = sizeSum;
             byte[] readBuffer = new byte[bytesToRead];
-
-            byte[] lengthBits, offsetBits, dataBits;
 
             using (FileStream outputStream = File.OpenWrite(outputPath))
             {
@@ -213,10 +191,23 @@ namespace DictionaryCoder.Coder
                     if (bytesRead == 0) break;
                     if (bytesRead != bytesToRead) Console.WriteLine("Invalid file compression!");
 
+                    byte[] lenBytes = new byte[] { (byte)((readBuffer[^2] & 0xF0) >> 4), 0x00 };
 
+                    // Remove length data from the array
+                    readBuffer[^2] = (byte)(readBuffer[^2] & 0x0F);
 
+                    int offset = BitConverter.ToInt16(readBuffer);
+                    int length = BitConverter.ToInt16(lenBytes);
+                    char nextChar = (char)readBuffer[^1];
+
+                    WriteDecoded(offset, length, nextChar);
                 }
             }
+        }
+
+        public void WriteDecoded(int offset, int length, char nextChar)
+        {
+            // Writing decoded data
         }
     }
 }
