@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace DictionaryCoder.Coder
 {
@@ -11,17 +12,17 @@ namespace DictionaryCoder.Coder
     {
         int LookAheadBufferSize { get; set; }
         int CodeBufferSize { get; set; }
-        int offsetBytesCount;
-        int lengthBytesCount;
-        int sizeSum;
+        int OffsetBytesCount;
+        int LengthBytesCount;
+        int SizeSum;
 
         public Coder(int CodeBufferSize, int LookAheadBufferSize)
         {
             this.CodeBufferSize = CodeBufferSize;
             this.LookAheadBufferSize = LookAheadBufferSize;
-            offsetBytesCount = (int)Math.Floor(Math.Log10(CodeBufferSize + LookAheadBufferSize) / Math.Log10(256) + 1);
-            lengthBytesCount = (int)Math.Floor(Math.Log10(LookAheadBufferSize) / Math.Log10(256) + 1);
-            sizeSum = 3;
+            OffsetBytesCount = (int)Math.Floor(Math.Log10(CodeBufferSize + LookAheadBufferSize) / Math.Log10(256) + 1);
+            LengthBytesCount = (int)Math.Floor(Math.Log10(LookAheadBufferSize) / Math.Log10(256) + 1);
+            SizeSum = 3;
         }
 
         /**
@@ -42,22 +43,23 @@ namespace DictionaryCoder.Coder
         public void EncodeLZ77(Stream fileStream, string outputPath)
         {
             byte[] codeBuffer = new byte[CodeBufferSize];
-            byte[] lookAheadBuffer = new byte[LookAheadBufferSize];
+            byte[] lookAheadBuffer = new byte[LookAheadBufferSize + 1];
 
             int shift = 0;
             int bytesToRead = 0;
             int inputSize = -1;
+            bool initialize = true;
             using (Stream outputStream = File.OpenWrite(outputPath))
             {
                 BinaryWriter binaryWriter = new BinaryWriter(outputStream);
 
                 while (LookAheadBufferSize > 0)
                 {
-                    byte[] readBuffer = new byte[LookAheadBufferSize];
+                    byte[] readBuffer = new byte[LookAheadBufferSize + 1];
 
                     // bytesToRead == 0 means it's the beggining of compression, therefore fully load the buffer.
                     // Min(shift, LookAheadBufferSize) Makes sure not to exceed the buffer's capacity.
-                    bytesToRead = bytesToRead == 0 ? LookAheadBufferSize : Math.Min(shift, LookAheadBufferSize);
+                    bytesToRead = bytesToRead == 0 ? lookAheadBuffer.Length : Math.Min(shift, lookAheadBuffer.Length);
 
                     if (inputSize != 0) inputSize = fileStream.Read(readBuffer, 0, bytesToRead);
 
@@ -69,7 +71,8 @@ namespace DictionaryCoder.Coder
                     lookAheadBuffer = lookAheadBuffer.Skip(shift).Concat(readBuffer.Take(bytesToRead)).ToArray();
 
                     // Check whether the file had been entirely processed.
-                    if (lookAheadBuffer[0] == 0x00 && inputSize == 0) break;
+                    if (!initialize & lookAheadBuffer[0] == 0x00 && inputSize == 0) break;
+                    initialize = false;
 
                     // Longest found matching sequence between lookahead and code buffers
                     Sequence repetition = FindRepetition(codeBuffer, lookAheadBuffer);
@@ -102,11 +105,11 @@ namespace DictionaryCoder.Coder
 
                 while (windowBuffer[codePointer] == windowBuffer[lookAheadPointer])
                 {
-                    // Found longest possible sequence
-                    if (++length == lookAheadBuffer.Length) break;
-
                     // Index out of bounds
-                    if (++lookAheadPointer >= windowBuffer.Length) break;
+                    if (++lookAheadPointer == windowBuffer.Length) break;
+                    // Found longest possible sequence
+                    if (++length == LookAheadBufferSize) break;
+
 
                     codePointer++;
                 }
@@ -140,8 +143,8 @@ namespace DictionaryCoder.Coder
             Console.WriteLine($"\n({offset},{length}){(char)nextChar}");
 
             // Saving offset and length to bytearrays of given size in little endian notation
-            byte[] offsetData = FormatToByteArray(offsetBytesCount, offset);
-            byte[] lengthData = FormatToByteArray(lengthBytesCount, length);
+            byte[] offsetData = FormatToByteArray(OffsetBytesCount, offset);
+            byte[] lengthData = FormatToByteArray(LengthBytesCount, length);
 
             //writing length information within the same byte as last part of offset
             // if you can save a byte do this
@@ -178,13 +181,21 @@ namespace DictionaryCoder.Coder
         */
         public void DecodeLZ77(Stream fileStream, string outputPath)
         {
-            int bytesToRead = sizeSum;
+            int bytesToRead = SizeSum;
             byte[] readBuffer = new byte[bytesToRead];
+            byte[] codeBuffer = new byte[CodeBufferSize];
+            bool initialize = true;
+            string output = "";
+            byte[] outputArray = new byte[0];
 
-            using (FileStream outputStream = File.OpenWrite(outputPath))
+            Console.WriteLine("DECOOODEEE");
+            using (Stream outputStream = new FileStream("test.txt", FileMode.Open, FileAccess.Write))
             {
-                BinaryWriter binaryWriter = new BinaryWriter(outputStream);
 
+                Console.WriteLine();
+                StreamWriter streamWriter = new StreamWriter(outputStream);
+
+                streamWriter.Flush();
                 while (bytesToRead > 0)
                 {
                     int bytesRead = fileStream.Read(readBuffer, 0, bytesToRead);
@@ -198,16 +209,36 @@ namespace DictionaryCoder.Coder
 
                     int offset = BitConverter.ToInt16(readBuffer);
                     int length = BitConverter.ToInt16(lenBytes);
-                    char nextChar = (char)readBuffer[^1];
+                    byte nextChar = readBuffer[^1];
+                    Console.WriteLine($"\n({offset},{length}){(char)nextChar}");
 
-                    WriteDecoded(offset, length, nextChar);
+                    // Filling codeBuffer with first byte read if it's the beginning of decoding
+                    if (initialize)
+                    {
+                        Array.Fill(codeBuffer, (byte)0x01);
+                        initialize = false;
+                    }
+                    byte[] tempbuf = new byte[codeBuffer.Length];
+                    Array.Copy(codeBuffer, tempbuf, codeBuffer.Length);
+
+                    byte[] decoded = new byte[length + 1];
+                    for (int i = 0; i < length; i++)
+                    {
+                        decoded[i] = tempbuf[offset + i];
+                        tempbuf = tempbuf.Concat(decoded.Skip(i).Take(1)).ToArray();
+                    }
+                    decoded[^1] = nextChar;
+                    codeBuffer = codeBuffer.Skip(decoded.Length).Concat(decoded).ToArray();
+                    outputArray = outputArray.Concat(decoded).ToArray();
+                    //string message = Encoding.UTF8.GetString(decoded);
+                    //output += message;
+                    //Console.WriteLine("output: " + output);
+                    //Console.WriteLine("message: " + message);
+                    //streamWriter.WriteLine(message);
                 }
+                string message = Encoding.UTF8.GetString(outputArray);
+                Console.WriteLine(message);
             }
-        }
-
-        public void WriteDecoded(int offset, int length, char nextChar)
-        {
-            // Writing decoded data
         }
     }
 }
