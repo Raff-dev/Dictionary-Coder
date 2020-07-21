@@ -37,18 +37,19 @@ namespace DictionaryCoder.Coder
 
         /**
         * Compresses given data using LZ77 algorithm
-        * Parameters : fileStream - file stream from witch to read and compress data from.
+        * Parameters : inputStream - file stream from witch to read and compress data from.
         *              outputPath - path to where create and write encoded data to
         */
-        public void EncodeLZ77(Stream fileStream, string outputPath)
+        public void EncodeLZ77(Stream inputStream, string outputPath)
         {
             byte[] codeBuffer = new byte[CodeBufferSize];
             byte[] lookAheadBuffer = new byte[LookAheadBufferSize + 1];
 
             int shift = 0;
             int bytesToRead = 0;
+            int bytesEncoded = 0;
             int inputSize = -1;
-            bool initialize = true;
+
             using (Stream outputStream = File.OpenWrite(outputPath))
             {
                 BinaryWriter binaryWriter = new BinaryWriter(outputStream);
@@ -61,18 +62,16 @@ namespace DictionaryCoder.Coder
                     // Min(shift, LookAheadBufferSize) Makes sure not to exceed the buffer's capacity.
                     bytesToRead = bytesToRead == 0 ? lookAheadBuffer.Length : Math.Min(shift, lookAheadBuffer.Length);
 
-                    if (inputSize != 0) inputSize = fileStream.Read(readBuffer, 0, bytesToRead);
-
-                    // Filling code buffer with leading byte of read bytes.
-                    if (shift == 0) Array.Fill(codeBuffer, readBuffer[0]);
+                    if (inputSize != 0) inputSize = inputStream.Read(readBuffer, 0, bytesToRead);
 
                     // Filling the buffers with the amount of bytes processed in previous iteration.
                     codeBuffer = codeBuffer.Skip(shift).Concat(lookAheadBuffer.Take(shift)).ToArray();
-                    lookAheadBuffer = lookAheadBuffer.Skip(shift).Concat(readBuffer.Take(bytesToRead)).ToArray();
+
+                    if (shift == 0) Array.Copy(readBuffer, lookAheadBuffer, bytesToRead);
+                    else lookAheadBuffer = lookAheadBuffer.Skip(shift).Concat(readBuffer.Take(bytesToRead)).ToArray();
 
                     // Check whether the file had been entirely processed.
-                    if (!initialize & lookAheadBuffer[0] == 0x00 && inputSize == 0) break;
-                    initialize = false;
+                    if (bytesEncoded >= inputStream.Length) break;
 
                     // Longest found matching sequence between lookahead and code buffers
                     Sequence repetition = FindRepetition(codeBuffer, lookAheadBuffer);
@@ -80,6 +79,7 @@ namespace DictionaryCoder.Coder
                     WriteEncoded(binaryWriter, repetition);
 
                     shift = repetition.Length + 1;
+                    bytesEncoded += shift;
                 }
             }
         }
@@ -109,7 +109,6 @@ namespace DictionaryCoder.Coder
                     if (++lookAheadPointer == windowBuffer.Length) break;
                     // Found longest possible sequence
                     if (++length == LookAheadBufferSize) break;
-
 
                     codePointer++;
                 }
@@ -176,31 +175,28 @@ namespace DictionaryCoder.Coder
 
         /**
         * Decompresses given data using LZ77 algorithm.
-        * Parameters : fileStream - file stream to whitch write decompressed data.
+        * Parameters : inputStream - file stream to whitch write decompressed data.
         *              outputPath - path to where create and write encoded data to
         */
-        public void DecodeLZ77(Stream fileStream, string outputPath)
+        public void DecodeLZ77(Stream inputStream, string outputPath)
         {
+            int bytesDecoded = 0;
             int bytesToRead = SizeSum;
             byte[] readBuffer = new byte[bytesToRead];
             byte[] codeBuffer = new byte[CodeBufferSize];
             bool initialize = true;
-            string output = "";
             byte[] outputArray = new byte[0];
 
             Console.WriteLine("DECOOODEEE");
-            using (Stream outputStream = new FileStream("test.txt", FileMode.Open, FileAccess.Write))
+            using (Stream outputStream = new FileStream(outputPath, FileMode.OpenOrCreate, FileAccess.Write))
             {
+                StreamWriter streamWriter = new StreamWriter(outputStream, Encoding.UTF8);
 
-                Console.WriteLine();
-                StreamWriter streamWriter = new StreamWriter(outputStream);
-
-                streamWriter.Flush();
                 while (bytesToRead > 0)
                 {
-                    int bytesRead = fileStream.Read(readBuffer, 0, bytesToRead);
+                    int bytesRead = inputStream.Read(readBuffer, 0, bytesToRead);
                     if (bytesRead == 0) break;
-                    if (bytesRead != bytesToRead) Console.WriteLine("Invalid file compression!");
+                    if (bytesRead != bytesToRead) Console.WriteLine("Invalid data format!");
 
                     byte[] lenBytes = new byte[] { (byte)((readBuffer[^2] & 0xF0) >> 4), 0x00 };
 
@@ -230,13 +226,14 @@ namespace DictionaryCoder.Coder
                     decoded[^1] = nextChar;
                     codeBuffer = codeBuffer.Skip(decoded.Length).Concat(decoded).ToArray();
                     outputArray = outputArray.Concat(decoded).ToArray();
-                    //string message = Encoding.UTF8.GetString(decoded);
-                    //output += message;
-                    //Console.WriteLine("output: " + output);
-                    //Console.WriteLine("message: " + message);
-                    //streamWriter.WriteLine(message);
+
+                    bytesDecoded += bytesRead;
+                    if (bytesDecoded >= inputStream.Length) break;
                 }
                 string message = Encoding.UTF8.GetString(outputArray);
+                streamWriter.WriteLine(message);
+                streamWriter.Close();
+
                 Console.WriteLine(message);
             }
         }
