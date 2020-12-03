@@ -1,3 +1,4 @@
+[tags]: <> (C#, ASP.NET, Algorithm)
 # Dictionary-Coder
 ### ASP.NET based project written in c# built using MVC (Model-View-Controller) pattern.
 ### Implementation of LZ77 text data compression algorithm
